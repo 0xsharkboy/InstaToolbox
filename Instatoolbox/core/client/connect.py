@@ -8,11 +8,31 @@ def account_info(cl):
     user_id = cl.account_info().dict()['pk']
     banner(f"Connected as {full_name} ({username}) | {user_id}")
 
+def load_settings(cl, session_id, config, mode):
+
+    # Check existing settings
+    settings = False
+    try:
+        cl.load_settings('./settings.json')
+        settings = True
+    except:
+        pass
+
+    # Load settings
+    if mode == "login":
+        cl.login(config["username"], config["password"])
+    else:
+        cl.login_by_sessionid(str(session_id))
+
+    # Save settings
+    if (settings == False):
+        cl.dump_settings('./settings.json')
+
 def connect_by_sessionid(cl):
     print("Two-factor authentification is enabled on your account. Please use a session id to login.")
     session_id=input("Enter the session id : ")
     try:
-        cl.login_by_sessionid(str(session_id))
+        load_settings(cl, session_id, "", "session")
         banner("Succesfully connected !")
         account_info(cl)
         return cl
@@ -28,7 +48,7 @@ def connect():
     if (config["proxy"] != ""):
         cl.set_proxy(config["proxy"])
     try:
-        cl.login(config["username"], config["password"])
+        load_settings(cl, "", config, "login")
         banner("Succesfully connected !")
         account_info(cl)
         return cl
