@@ -1,3 +1,4 @@
 instagrapi
 colorama
-getpass
+json
+pillow>=8.1.1
